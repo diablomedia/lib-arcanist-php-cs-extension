@@ -10,49 +10,26 @@ class PhpCsFixerLinter extends \ArcanistExternalLinter
         '--dry-run',
         '--diff',
         '--format=json',
-        '--using-cache=no',
     ];
 
     /**
-     * @var LinterConfiguration
+     * @var string Config file path
      */
-    private $configuration;
+    private $configFile = null;
 
     /**
      * @var LintMessageBuilder
      */
     private $lintMessageBuilder;
 
-    /**
-     * @param LinterConfiguration $configuration
-     */
-    public function __construct(LinterConfiguration $configuration = null)
-    {
-        if ($configuration === null) {
-            $configuration = new LinterConfiguration();
-        }
-
-        $this->configuration = $configuration;
-
-        $guessMessages = true;
-        if (version_compare($this->getVersion(), '2.8.0', '>=')) {
-            $this->defaultFlags[] = '--diff-format=udiff';
-            $guessMessages = false;
-        }
-
-        $this->lintMessageBuilder = new LintMessageBuilder($guessMessages);
-
-        $this->setPaths($this->configuration->getPaths());
-    }
-
     public function getLinterName()
     {
-        return 'PhpCsFixerLinter';
+        return 'php-cs-fixer';
     }
 
     public function getInfoName()
     {
-        return 'PHP_CS_FIXER Linter';
+        return 'php-cs-fixer';
     }
 
     public function getInfoURI()
@@ -76,7 +53,28 @@ class PhpCsFixerLinter extends \ArcanistExternalLinter
 
     public function getMandatoryFlags()
     {
-        return ['fix'];
+        $guessMessages = true;
+
+        if (version_compare($this->getVersion(), '2.8.0', '>=')) {
+            $this->defaultFlags[] = '--diff-format=udiff';
+            $guessMessages = false;
+        }
+
+        $this->lintMessageBuilder = new LintMessageBuilder($guessMessages);
+
+        $flags = array(
+            'fix',
+        );
+
+        if ($this->configFile !== null) {
+            $flags = array_merge(
+                $flags,
+                $this->defaultFlags,
+                [sprintf('--config=%s', $this->configFile)]
+            );
+        }
+
+        return $flags;
     }
 
     public function getInstallInstructions()
@@ -84,17 +82,21 @@ class PhpCsFixerLinter extends \ArcanistExternalLinter
         return 'By installing this package, you\'ve already installed all dependencies!';
     }
 
-    public function getDefaultFlags()
+    public function setLinterConfigurationValue($key, $value)
     {
-        return array_merge(
-            $this->defaultFlags,
-            [sprintf('--config=%s', $this->configuration->getPhpCsFile())]
-        );
+        switch ($key) {
+            case 'config':
+                $this->configFile = $value;
+                return;
+            default:
+                parent::setLinterConfigurationValue($key, $value);
+                return;
+        }
     }
 
     public function getDefaultBinary()
     {
-        return $this->configuration->getBinaryFile();
+        return 'php-cs-fixer';
     }
 
     /**
@@ -121,6 +123,19 @@ class PhpCsFixerLinter extends \ArcanistExternalLinter
         }
 
         return $messages;
+    }
+
+    public function getLinterConfigurationOptions()
+    {
+        $options = array(
+            'config' => array(
+                'type' => 'optional string',
+                'help' => pht(
+                    'The path to your .php_cs file. Will be provided as -config <path> to php-cs-fixer.'
+                ),
+            ),
+        );
+        return $options + parent::getLinterConfigurationOptions();
     }
 
     public function shouldExpectCommandErrors()

@@ -10,13 +10,10 @@ phutil_register_library_map(array(
     '__library_version__' => 2,
     'class' => array(
         'LintMessageBuilder' => 'Lint/Linter/LintMessageBuilder.php',
-        'LinterConfiguration' => 'Lint/Linter/LinterConfiguration.php',
-        'PhpCsFixerLintEngine' => 'Lint/Engine/PhpCsFixerLintEngine.php',
         'PhpCsFixerLinter' => 'Lint/Linter/PhpCsFixerLinter.php',
     ),
     'function' => array(),
     'xmap' => array(
-        'PhpCsFixerLintEngine' => '\\ArcanistLintEngine',
-        'PhpCsFixerLinter' => '\\ArcanistExternalLinter',
+        'PhpCsFixerLinter' => 'ArcanistExternalLinter',
     ),
 ));

@@ -57,6 +57,7 @@ class LintMessageBuilder
                         $message = new \ArcanistLintMessage();
                         $message->setName($this->getTrimmedAppliedFixers($fixData['appliedFixers']));
                         $message->setPath($path);
+                        $message->setCode('php-cs-fixer');
                         $message->setSeverity(\ArcanistLintSeverity::SEVERITY_WARNING);
                         $message->setChar(1);
                         $message->setLine($lineNo);
@@ -318,7 +319,7 @@ class LintMessageBuilder
         $message = new \ArcanistLintMessage();
         $message->setName($name);
         $message->setPath($path);
-        $message->setCode('PHP_CS_FIXER');
+        $message->setCode('php-cs-fixer');
         $message->setLine($line);
         $message->setSeverity(\ArcanistLintSeverity::SEVERITY_WARNING);
 

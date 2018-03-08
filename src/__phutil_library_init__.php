@@ -17,4 +17,4 @@ spl_autoload_register(function($className) use ($vendorDir) {
     }
 });
 
-phutil_register_library('php-cs-fixer-lint-engine', __FILE__);
+phutil_register_library('php-cs-fixer', __FILE__);
