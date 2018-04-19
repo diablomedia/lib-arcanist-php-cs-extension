@@ -69,7 +69,7 @@ class PhpCsFixerLinter extends \ArcanistExternalLinter
         if ($this->configFile !== null) {
             $flags = array_merge(
                 $flags,
-                $this->defaultFlags,
+                array_unique($this->defaultFlags),
                 [sprintf('--config=%s', $this->configFile)]
             );
         }
